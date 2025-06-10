@@ -11,9 +11,9 @@ export default async function handler(req, res) {
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
-        "Authorization": "Bearer YOUR_API_KEY",
+        "Authorization": "Bearer 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",
         "Content-Type": "application/json",
-        "HTTP-Referer": "https://your-domain.vercel.app", // Ganti domain sesuai kamu
+        "HTTP-Referer": "https://fajri03s-projects.vercel.app/", // Ganti domain sesuai kamu
       },
       body: JSON.stringify({
         model: "deepseek-chat",
