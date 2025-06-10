@@ -18,7 +18,7 @@ export default async function handler(req, res) {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: "deepseek-chat",
+        model: "deepseek/deepseek-r1-0528:free",
         messages: [systemPrompt, ...messages],
         temperature: 0.7
       })
