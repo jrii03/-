@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Chatbot Bahasa Jepang</title>
+  <style>
+    :root {
+      --primary: #6c4ab6;
+      --bg: #f4f4f9;
+      --text: #2c2c2c;
+      --bot: #eae6ff;
+      --user: #d1e7ff;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: var(--bg);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    header {
+      background-color: var(--primary);
+      color: white;
+      padding: 1.5rem;
+      font-size: 1.5rem;
+      text-align: center;
+      font-weight: bold;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    main {
+      flex-grow: 1;
+      overflow-y: auto;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chat-bubble {
+      max-width: 75%;
+      margin-bottom: 1rem;
+      padding: 1rem;
+      border-radius: 1rem;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    .user {
+      align-self: flex-end;
+      background-color: var(--user);
+    }
+
+    .bot {
+      align-self: flex-start;
+      background-color: var(--bot);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    form {
+      display: flex;
+      padding: 1rem;
+      background-color: white;
+      border-top: 1px solid #ddd;
+      box-shadow: 0 -1px 5px rgba(0,0,0,0.05);
+    }
+
+    input[type="text"] {
+      flex-grow: 1;
+      padding: 0.75rem;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 0.5rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input[type="text"]:focus {
+      border-color: var(--primary);
+    }
+
+    button {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 0 1.5rem;
+      margin-left: 0.5rem;
+      font-size: 1rem;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    button:hover {
+      background-color: #5a3ba0;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.9rem;
+      padding: 0.75rem;
+      background-color: #fafafa;
+      border-top: 1px solid #eee;
+    }
+
+    footer a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <header>AI Chatbot Bahasa Jepang</header>
+  <main id="chat-container"></main>
+  <form id="chat-form">
+    <input type="text" id="user-input" placeholder="Tulis pertanyaanmu di sini..." autocomplete="off" required>
+    <button type="submit">Kirim</button>
+  </form>
+  <footer>
+    ❤️ Dukung proyek ini: <a href="https://trakteer.id/username" target="_blank">Trakteer</a> | <a href="https://saweria.co/username" target="_blank">Saweria</a>
+  </footer>
+  <script>
+    const chatContainer = document.getElementById("chat-container");
+    const chatForm = document.getElementById("chat-form");
+    const userInput = document.getElementById("user-input");
+
+    const systemPrompt = {
+      role: "system",
+      content: "Kamu adalah guru pribadi bahasa Jepang. Jawablah hanya pertanyaan yang berhubungan dengan bahasa Jepang. Jika pertanyaan di luar topik, tolak dengan sopan."
+    };
+
+    let messages = [systemPrompt];
+
+    function appendMessage(text, className) {
+      const bubble = document.createElement("div");
+      bubble.className = `chat-bubble ${className}`;
+      bubble.textContent = text;
+      chatContainer.appendChild(bubble);
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    async function getBotReply() {
+      appendMessage("...", "bot");
+
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages })
+      });
+
+      const data = await res.json();
+      const reply = data.reply || "(Tidak ada balasan)";
+
+      chatContainer.lastChild.remove();
+      appendMessage(reply, "bot");
+
+      messages.push({ role: "assistant", content: reply });
+    }
+
+    chatForm.addEventListener("submit", e => {
+      e.preventDefault();
+      const input = userInput.value.trim();
+      if (!input) return;
+
+      appendMessage(input, "user");
+      messages.push({ role: "user", content: input });
+      userInput.value = "";
+      getBotReply();
+    });
+  </script>
+</body>
+</html>
